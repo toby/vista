@@ -101,14 +101,14 @@ export function defaultSceneParams(): SceneParams {
     terrain: {
       seed: 12345,
       sizeLevel: 8,
-      roughness: 0.55,
-      verticalScale: 80,
+      roughness: 0.5,
+      verticalScale: 60,
     },
     camera: {
-      position: { x: 0, y: 90, z: 220 },
-      target: { x: 0, y: 20, z: 0 },
+      position: { x: 40, y: 140, z: 300 },
+      target: { x: 0, y: 10, z: -20 },
       bank: 0,
-      lens: 55,
+      lens: 50,
     },
     sun: {
       azimuth: 135,

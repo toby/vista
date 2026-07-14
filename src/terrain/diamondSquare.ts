@@ -34,10 +34,11 @@ export function generateTerrain(opts: TerrainGenOptions): Heightmap {
     data[y * size + x] = v;
   };
 
-  // Roughness -> per-step amplitude ratio. roughness=1 keeps full amplitude
-  // (very jagged); roughness=0 halves amplitude each step (smooth).
+  // Roughness -> per-step amplitude ratio (persistence). Lower persistence
+  // damps fine detail into smooth, rolling terrain; higher keeps it jagged.
+  // roughness 0.5 -> 0.50 (natural), 0 -> 0.30 (smooth), 1 -> 0.70 (rugged).
   const roughness = Math.min(1, Math.max(0, opts.roughness));
-  const ratio = Math.pow(2, -(1 - roughness));
+  const ratio = 0.3 + roughness * 0.4;
 
   let scale = 1.0;
 

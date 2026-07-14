@@ -52,7 +52,7 @@ export class Renderer {
     this.camera.position.set(0, 90, 220);
     this.camera.lookAt(0, 20, 0);
 
-    this.hemisphere = new HemisphereLight('#dff0ff', '#3a3326', 0.9);
+    this.hemisphere = new HemisphereLight('#dff0ff', '#3a3326', 0.55);
     this.scene.add(this.hemisphere);
 
     this.defaultMaterial = new MeshStandardMaterial({
