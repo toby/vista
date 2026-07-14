@@ -35,6 +35,9 @@ export class App {
   private readonly sky: SkyDome;
   private readonly haze: Haze;
   private readonly cameraRig: CameraRig;
+  private dirtyRegen = false;
+  private dirtyGeometry = false;
+  private dirtyRecolor = false;
 
   constructor(canvas: HTMLCanvasElement) {
     this.store = new Store(defaultSceneParams());
@@ -70,6 +73,7 @@ export class App {
 
     this.store.subscribe((next) => this.reconcile(next));
     this.renderer.addFrameHook((dt) => {
+      this.processDirty();
       this.cameraRig.update();
       this.sky.update(dt);
     });
@@ -77,7 +81,11 @@ export class App {
     this.renderer.start();
   }
 
-  /** React to a param change with the minimum necessary scene updates. */
+  /**
+   * React to a param change. Cheap updates (atmosphere, render mode, camera) run
+   * immediately; expensive terrain work is flagged and coalesced to at most once
+   * per frame, so dragging a slider that fires many input events stays smooth.
+   */
   private reconcile(next: SceneParams): void {
     const prev = this.params;
     if (next === prev) return;
@@ -85,28 +93,39 @@ export class App {
 
     const t = next.terrain;
     const pt = prev.terrain;
-    const needRegen =
+    const regen =
       t.seed !== pt.seed ||
       t.sizeLevel !== pt.sizeLevel ||
       t.roughness !== pt.roughness;
-    const needGeometry = needRegen || t.verticalScale !== pt.verticalScale;
+    const geometry = regen || t.verticalScale !== pt.verticalScale;
     const levelsChanged = !eq(prev.levels, next.levels);
-    const needRecolor = needGeometry || levelsChanged;
-    const needAtmosphere =
-      needGeometry ||
+
+    if (regen) this.dirtyRegen = true;
+    if (geometry) this.dirtyGeometry = true;
+    if (geometry || levelsChanged) this.dirtyRecolor = true;
+
+    const atmosphere =
+      geometry ||
       levelsChanged ||
       !eq(prev.sun, next.sun) ||
       !eq(prev.haze, next.haze) ||
       !eq(prev.sky, next.sky);
-
-    if (needRegen) this.heightmap = generateTerrain(t);
-    if (needGeometry) this.geometry = this.buildGeometry();
-    if (needRecolor) this.recolor();
-    if (needAtmosphere) this.applyAtmosphere();
+    if (atmosphere) this.applyAtmosphere();
     if (prev.renderMode !== next.renderMode) this.applyRenderMode();
     if (!this.cameraRig.writingToStore && !eq(prev.camera, next.camera)) {
       this.cameraRig.syncFromParams(next.camera);
     }
+  }
+
+  /** Apply any pending terrain work; called once per frame before rendering. */
+  private processDirty(): void {
+    if (!this.dirtyRegen && !this.dirtyGeometry && !this.dirtyRecolor) return;
+    if (this.dirtyRegen) this.heightmap = generateTerrain(this.params.terrain);
+    if (this.dirtyGeometry) this.geometry = this.buildGeometry();
+    if (this.dirtyRecolor) this.recolor();
+    this.dirtyRegen = false;
+    this.dirtyGeometry = false;
+    this.dirtyRecolor = false;
   }
 
   private buildGeometry(): BufferGeometry {
