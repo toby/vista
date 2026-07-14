@@ -12,6 +12,8 @@ import type { CameraParams, SceneParams } from '../state/SceneParams';
 
 export class CameraRig {
   readonly controls: OrbitControls;
+  /** True while the rig is writing its own change into the store (loop guard). */
+  writingToStore = false;
   private readonly camera: PerspectiveCamera;
   private readonly store: Store<SceneParams>;
   private applyingFromStore = false;
@@ -55,12 +57,14 @@ export class CameraRig {
     if (this.applyingFromStore) return;
     const cam = this.camera;
     const t = this.controls.target;
+    this.writingToStore = true;
     this.store.patch({
       camera: {
         position: { x: cam.position.x, y: cam.position.y, z: cam.position.z },
         target: { x: t.x, y: t.y, z: t.z },
       },
     });
+    this.writingToStore = false;
   }
 
   /** World up rotated about the view axis by the bank angle. */
