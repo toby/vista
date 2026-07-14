@@ -1,13 +1,10 @@
 import './styles/global.css';
+import { App } from './app';
 
-// Entry point. The full application (state + renderer + UI) is assembled in
-// app.ts during the integration phase; this bootstrap keeps the module graph
-// valid and the dev server serving from phase 0 onward.
-const ui = document.getElementById('ui-root');
-if (ui) {
-  const boot = document.createElement('div');
-  boot.textContent = 'VistaPro Web — booting…';
-  boot.style.cssText =
-    'position:absolute;left:12px;top:12px;color:#8fdcff;font:12px monospace';
-  ui.appendChild(boot);
+const canvas = document.getElementById('viewport');
+if (!(canvas instanceof HTMLCanvasElement)) {
+  throw new Error('#viewport canvas not found');
 }
+
+// Expose for debugging / headless verification.
+(window as unknown as { app: App }).app = new App(canvas);
