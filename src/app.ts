@@ -15,6 +15,8 @@ import { Sun } from './render/lighting';
 import { Water } from './render/water';
 import { SkyDome } from './render/sky';
 import { Haze } from './render/haze';
+import { CameraRig } from './render/cameraRig';
+import { RetroTerrainMaterial } from './render/retro/retroMaterial';
 import { Renderer } from './render/Renderer';
 
 export class App {
@@ -22,10 +24,12 @@ export class App {
   readonly renderer: Renderer;
   private heightmap: Heightmap;
   private readonly modernMaterial: MeshStandardMaterial;
+  private readonly retroMaterial: RetroTerrainMaterial;
   private readonly sun: Sun;
   private readonly water: Water;
   private readonly sky: SkyDome;
   private readonly haze: Haze;
+  private readonly cameraRig: CameraRig;
 
   constructor(canvas: HTMLCanvasElement) {
     this.store = new Store(defaultSceneParams());
@@ -36,6 +40,7 @@ export class App {
       roughness: 0.95,
       metalness: 0,
     });
+    this.retroMaterial = new RetroTerrainMaterial();
 
     this.sun = new Sun();
     this.sun.addTo(this.renderer.scene);
@@ -47,8 +52,16 @@ export class App {
 
     this.heightmap = this.buildTerrain();
     this.applyAtmosphere();
-    this.renderer.applyCamera(this.store.get().camera);
-    this.renderer.addFrameHook((dt) => this.sky.update(dt));
+    this.applyRenderMode();
+    this.cameraRig = new CameraRig(
+      this.renderer.camera,
+      this.renderer.renderer.domElement,
+      this.store,
+    );
+    this.renderer.addFrameHook((dt) => {
+      this.cameraRig.update();
+      this.sky.update(dt);
+    });
     this.renderer.renderOnce();
     this.renderer.start();
   }
@@ -56,10 +69,21 @@ export class App {
   /** Push sun, water, sky, and haze params into their subsystems. */
   private applyAtmosphere(): void {
     const params = this.store.get();
+    const sunDir = this.sun.direction(params.sun);
     this.sun.apply(params.sun);
     this.water.apply(params);
-    this.sky.apply(params, this.sun.direction(params.sun));
+    this.sky.apply(params, sunDir);
     this.haze.apply(params.haze);
+    this.retroMaterial.apply(params.sun, sunDir);
+  }
+
+  /** Select the terrain material for the current render mode (modern/retro). */
+  private applyRenderMode(): void {
+    const material =
+      this.store.get().renderMode === 'retro'
+        ? this.retroMaterial
+        : this.modernMaterial;
+    this.renderer.setTerrainMaterial(material);
   }
 
   /** Regenerate the heightmap and mesh from the current terrain params. */
@@ -71,7 +95,6 @@ export class App {
     });
     applyTerrainColors(geometry, hm, params.levels);
     this.renderer.setTerrainGeometry(geometry);
-    this.renderer.setTerrainMaterial(this.modernMaterial);
     return hm;
   }
 
