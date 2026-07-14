@@ -51,6 +51,8 @@ export class Renderer {
     this.camera = new PerspectiveCamera(55, 1, 0.1, 20000);
     this.camera.position.set(0, 90, 220);
     this.camera.lookAt(0, 20, 0);
+    // Added to the scene so camera-attached objects (e.g. the sky dome) render.
+    this.scene.add(this.camera);
 
     this.hemisphere = new HemisphereLight('#dff0ff', '#3a3326', 0.55);
     this.scene.add(this.hemisphere);

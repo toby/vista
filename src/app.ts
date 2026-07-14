@@ -13,6 +13,8 @@ import { buildTerrainGeometry } from './render/TerrainMesh';
 import { applyTerrainColors } from './render/coloring';
 import { Sun } from './render/lighting';
 import { Water } from './render/water';
+import { SkyDome } from './render/sky';
+import { Haze } from './render/haze';
 import { Renderer } from './render/Renderer';
 
 export class App {
@@ -22,6 +24,8 @@ export class App {
   private readonly modernMaterial: MeshStandardMaterial;
   private readonly sun: Sun;
   private readonly water: Water;
+  private readonly sky: SkyDome;
+  private readonly haze: Haze;
 
   constructor(canvas: HTMLCanvasElement) {
     this.store = new Store(defaultSceneParams());
@@ -35,16 +39,27 @@ export class App {
 
     this.sun = new Sun();
     this.sun.addTo(this.renderer.scene);
-    this.sun.apply(this.store.get().sun);
-
     this.water = new Water();
     this.water.addTo(this.renderer.scene);
-    this.water.apply(this.store.get());
+    this.sky = new SkyDome(this.renderer.camera);
+    this.haze = new Haze();
+    this.haze.addTo(this.renderer.scene);
 
     this.heightmap = this.buildTerrain();
+    this.applyAtmosphere();
     this.renderer.applyCamera(this.store.get().camera);
+    this.renderer.addFrameHook((dt) => this.sky.update(dt));
     this.renderer.renderOnce();
     this.renderer.start();
+  }
+
+  /** Push sun, water, sky, and haze params into their subsystems. */
+  private applyAtmosphere(): void {
+    const params = this.store.get();
+    this.sun.apply(params.sun);
+    this.water.apply(params);
+    this.sky.apply(params, this.sun.direction(params.sun));
+    this.haze.apply(params.haze);
   }
 
   /** Regenerate the heightmap and mesh from the current terrain params. */
