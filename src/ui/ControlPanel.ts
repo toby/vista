@@ -63,7 +63,7 @@ export class ControlPanel {
     const title = document.createElement('div');
     title.className = 'vp-titlebar';
     title.innerHTML =
-      '<span>VistaPro Web</span><span class="vp-sub">landscape generator</span>';
+      '<span>Vista</span><span class="vp-sub">landscape generator</span>';
     panel.append(title);
 
     const scroll = document.createElement('div');
