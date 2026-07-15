@@ -1,5 +1,16 @@
 # Vista ⛰️
 
+<p align="center">
+  <a href="https://toby.github.io/vista/">
+    <img src="docs/screenshot.png" width="100%"
+      alt="Vista rendering a snow-capped fractal island in the browser, beside its retro VistaPro-style control panel">
+  </a>
+</p>
+
+<p align="center">
+  <sub><em>Seed 137, generated and rendered entirely in the browser — nudge any slider on the right and the scene updates live.</em></sub>
+</p>
+
 A browser-based homage to **[VistaPro](https://en.wikipedia.org/wiki/VistaPro)**,
 the classic 1990s 3-D fractal scenery generator. Generate a landscape from a
 number, shape it with rivers, lakes, valleys and cliffs, color it by elevation,
