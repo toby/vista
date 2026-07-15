@@ -125,3 +125,7 @@ directory.
 Inspired by VistaPro, originally written by John Hinkley (Virtual Reality Labs /
 Hypercube Engineering). This is an independent, from-scratch web recreation and
 is not affiliated with the original.
+
+## License
+
+Released under the [MIT License](LICENSE).

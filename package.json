@@ -4,6 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Vista — a pure client-side fractal 3D scenery generator",
+  "license": "MIT",
+  "author": "Toby Padilla",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
