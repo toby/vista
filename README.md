@@ -1,4 +1,4 @@
-# VistaPro Web
+# Vista ⛰️
 
 A browser-based homage to **[VistaPro](https://en.wikipedia.org/wiki/VistaPro)**,
 the classic 1990s 3-D fractal scenery generator. Generate a landscape from a
