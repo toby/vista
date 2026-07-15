@@ -3,10 +3,10 @@
 
 .vp-panel {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 44px;
+  right: 10px;
   bottom: 10px;
-  width: 288px;
+  width: 300px;
   display: flex;
   flex-direction: column;
   background: #c3c7cb;
@@ -19,6 +19,42 @@
   border-bottom: 2px solid #6b6f73;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
   user-select: none;
+}
+
+/* Top menu bar (Project · Load · Save · GrMode · Script · ImpExp · IQ). */
+.vp-menubar {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  background: #c3c7cb;
+  border-top: 2px solid #f4f6f8;
+  border-left: 2px solid #f4f6f8;
+  border-right: 2px solid #6b6f73;
+  border-bottom: 2px solid #6b6f73;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+  font-family: "Courier New", "DejaVu Sans Mono", monospace;
+}
+.vp-menu-item {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 5px 12px;
+  cursor: pointer;
+  color: #101010;
+  background: #c3c7cb;
+  border-top: 2px solid #f4f6f8;
+  border-left: 2px solid #f4f6f8;
+  border-right: 2px solid #6b6f73;
+  border-bottom: 2px solid #6b6f73;
+}
+.vp-menu-item:active {
+  border-top: 2px solid #6b6f73;
+  border-left: 2px solid #6b6f73;
+  border-right: 2px solid #f4f6f8;
+  border-bottom: 2px solid #f4f6f8;
 }
 
 .vp-titlebar {
@@ -70,8 +106,8 @@
 }
 
 .vp-group-header {
-  background: #00007b;
-  color: #fff;
+  background: #b0b4b8;
+  color: #101010;
   padding: 3px 6px;
   cursor: pointer;
   font-weight: bold;
@@ -79,6 +115,10 @@
   font-size: 11px;
   display: flex;
   justify-content: space-between;
+  border-top: 1px solid #f4f6f8;
+  border-left: 1px solid #f4f6f8;
+  border-right: 1px solid #6b6f73;
+  border-bottom: 1px solid #6b6f73;
 }
 
 .vp-group-body {
@@ -145,13 +185,18 @@
   min-width: 0;
   font-family: inherit;
   font-size: 12px;
-  padding: 2px 3px;
-  background: #eef0f2;
-  color: #101010;
+  padding: 2px 4px;
+  background: #15181c;
+  color: #d7e6da;
+  font-variant-numeric: tabular-nums;
   border-top: 2px solid #6b6f73;
   border-left: 2px solid #6b6f73;
   border-right: 2px solid #f4f6f8;
   border-bottom: 2px solid #f4f6f8;
+}
+.vp-row select option {
+  background: #15181c;
+  color: #d7e6da;
 }
 
 .vp-row input[type="color"] {
@@ -166,6 +211,13 @@
   flex: 0 0 46px;
   text-align: right;
   font-variant-numeric: tabular-nums;
+  background: #15181c;
+  color: #d7e6da;
+  padding: 2px 4px;
+  border-top: 2px solid #6b6f73;
+  border-left: 2px solid #6b6f73;
+  border-right: 2px solid #f4f6f8;
+  border-bottom: 2px solid #f4f6f8;
 }
 
 .vp-actions {
@@ -211,4 +263,45 @@
   padding: 4px 8px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   pointer-events: none;
+}
+
+/* Toggle button (boolean control). */
+.vp-btn.vp-toggle {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+.vp-btn.vp-on {
+  background: #1c7fd6;
+  color: #fff;
+  border-top: 2px solid #6b6f73;
+  border-left: 2px solid #6b6f73;
+  border-right: 2px solid #f4f6f8;
+  border-bottom: 2px solid #f4f6f8;
+}
+
+/* Mutually-exclusive button row (Poly 1·2·4·8, Texture O·L·M·H). */
+.vp-btngroup {
+  display: flex;
+  flex: 1;
+  gap: 3px;
+  min-width: 0;
+}
+.vp-btn.vp-btn-mini {
+  flex: 1;
+  padding: 3px 0;
+  text-align: center;
+}
+
+/* Wide read-only value (camera deltas). */
+.vp-readout.vp-readout-wide {
+  flex: 1;
+  text-align: right;
+  background: #23262b;
+  color: #7dff9b;
+  padding: 2px 5px;
+  border-top: 2px solid #6b6f73;
+  border-left: 2px solid #6b6f73;
+  border-right: 2px solid #f4f6f8;
+  border-bottom: 2px solid #f4f6f8;
 }

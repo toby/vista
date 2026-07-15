@@ -18,9 +18,16 @@ import {
   Vector3,
   WebGLRenderer,
 } from 'three';
-import type { CameraParams } from '../state/SceneParams';
+import type { CameraParams, GraphicsMode } from '../state/SceneParams';
 
 export type FrameHook = (dtSeconds: number) => void;
+
+const GR_MODE_SIZES: Record<Exclude<GraphicsMode, 'fit'>, [number, number]> = {
+  '320x240': [320, 240],
+  '640x480': [640, 480],
+  '800x600': [800, 600],
+  '1024x768': [1024, 768],
+};
 
 export class Renderer {
   readonly renderer: WebGLRenderer;
@@ -37,6 +44,8 @@ export class Renderer {
   private rafId = 0;
   private lastTime = 0;
   private running = false;
+  private grMode: GraphicsMode = 'fit';
+  private iq = 1;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -116,11 +125,32 @@ export class Renderer {
     };
   }
 
+  /**
+   * Set the output resolution preset (GrMode) and image quality (IQ). `fit`
+   * follows the viewport at IQ-scaled device pixels; presets render into a
+   * fixed-size buffer that CSS scales to fill the viewport, for a chunkier,
+   * period-accurate image.
+   */
+  setRenderConfig(grMode: GraphicsMode, iq: number): void {
+    this.grMode = grMode;
+    this.iq = Math.max(0.25, iq);
+    this.resize();
+  }
+
   resize(): void {
-    const width = this.canvas.clientWidth || window.innerWidth;
-    const height = this.canvas.clientHeight || window.innerHeight;
-    this.renderer.setSize(width, height, false);
-    this.camera.aspect = width / height;
+    const clientW = this.canvas.clientWidth || window.innerWidth;
+    const clientH = this.canvas.clientHeight || window.innerHeight;
+    if (this.grMode === 'fit') {
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio * this.iq, 4));
+      this.renderer.setSize(clientW, clientH, false);
+      this.camera.aspect = clientW / clientH;
+    } else {
+      const [w, h] = GR_MODE_SIZES[this.grMode];
+      this.renderer.setPixelRatio(Math.min(this.iq, 4));
+      // updateStyle=false keeps the CSS size at 100% so the buffer is scaled up.
+      this.renderer.setSize(w, h, false);
+      this.camera.aspect = clientW / clientH;
+    }
     this.camera.updateProjectionMatrix();
   }
 

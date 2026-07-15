@@ -100,4 +100,19 @@ export class RetroTerrainMaterial extends ShaderMaterial {
     (this.uniforms.uSunColor.value as Color).set(sun.color);
     (this.uniforms.uSunDir.value as Vector3).copy(sunDir);
   }
+
+  /** Ordered-dither amplitude in display space (Dither/PDithr), expected 0..1. */
+  setDither(amount: number): void {
+    this.uniforms.uDither.value = Math.max(0, amount);
+  }
+
+  /** Number of posterization levels for the retro palette (NumClr). */
+  setColorLevels(levels: number): void {
+    this.uniforms.uColorLevels.value = Math.max(2, Math.round(levels));
+  }
+
+  /** Number of quantized shading bands (faceted light steps). */
+  setShadeLevels(levels: number): void {
+    this.uniforms.uShadeLevels.value = Math.max(1, Math.round(levels));
+  }
 }

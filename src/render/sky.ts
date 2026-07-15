@@ -33,6 +33,9 @@ const fragmentShader = /* glsl */ `
   uniform vec3 uCloudColor;
   uniform float uCloudCover;
   uniform float uTime;
+  uniform float uStars;
+  uniform float uClouds;
+  uniform float uHorizonBand;
 
   float hash(vec2 p) {
     return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
@@ -62,8 +65,23 @@ const fragmentShader = /* glsl */ `
     vec3 dir = normalize(vDir);
     float up = clamp(dir.y, 0.0, 1.0);
 
-    // Vertical gradient.
-    vec3 sky = mix(uHorizon, uTop, pow(up, 0.55));
+    // Vertical gradient. The horizon band can be toggled off for a flat sky.
+    vec3 sky = uHorizonBand > 0.5
+      ? mix(uHorizon, uTop, pow(up, 0.55))
+      : uTop;
+
+    // Stars: sparse twinkling points in the upper hemisphere, brightened in
+    // proportion to how dark the underlying sky is (so they show at dusk/night).
+    if (uStars > 0.5 && dir.y > 0.02) {
+      vec2 sc = dir.xz / (dir.y + 0.3);
+      vec2 cell = floor(sc * 60.0);
+      float h = hash(cell);
+      if (h > 0.995) {
+        float tw = 0.65 + 0.35 * sin(uTime * 3.0 + h * 100.0);
+        float darkness = 1.0 - clamp(max(max(sky.r, sky.g), sky.b), 0.0, 1.0);
+        sky += vec3(tw) * darkness * 0.9;
+      }
+    }
 
     // Sun disc + glow.
     float sd = max(dot(dir, normalize(uSunDir)), 0.0);
@@ -72,7 +90,7 @@ const fragmentShader = /* glsl */ `
     sky += uSunColor * (disc + glow);
 
     // Clouds: project the sky direction onto a plane overhead.
-    if (dir.y > 0.04 && uCloudCover > 0.001) {
+    if (uClouds > 0.5 && dir.y > 0.04 && uCloudCover > 0.001) {
       vec2 cuv = dir.xz / (dir.y + 0.15);
       cuv = cuv * 1.4 + vec2(uTime * 0.006, uTime * 0.004);
       float n = fbm(cuv);
@@ -107,6 +125,9 @@ export class SkyDome {
         uCloudColor: { value: new Color('#ffffff') },
         uCloudCover: { value: 0.4 },
         uTime: { value: 0 },
+        uStars: { value: 0 },
+        uClouds: { value: 1 },
+        uHorizonBand: { value: 1 },
       },
       vertexShader,
       fragmentShader,
@@ -118,7 +139,7 @@ export class SkyDome {
     camera.add(this.mesh);
   }
 
-  /** Update sky colors, cloud cover, and sun direction from params. */
+  /** Update sky colors, cloud cover, sun direction, and feature toggles. */
   apply(params: SceneParams, sunDir: Vector3): void {
     const u = this.material.uniforms;
     (u.uTop.value as Color).set(params.sky.topColor);
@@ -127,6 +148,10 @@ export class SkyDome {
     u.uCloudCover.value = params.sky.cloudCover;
     (u.uSunColor.value as Color).set(params.sun.color);
     (u.uSunDir.value as Vector3).copy(sunDir);
+    u.uStars.value = params.features.starsEnabled ? 1 : 0;
+    u.uClouds.value = params.features.cloudsEnabled ? 1 : 0;
+    u.uHorizonBand.value = params.features.horizonEnabled ? 1 : 0;
+    this.mesh.visible = params.features.skyEnabled;
   }
 
   /** Advance cloud drift. */

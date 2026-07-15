@@ -168,3 +168,94 @@ export function group(title: string, collapsed = false): Group {
   g.append(header, body);
   return { el: g, body };
 }
+
+export interface ToggleOptions {
+  label: string;
+  onInput: (v: boolean) => void;
+}
+
+/** A labeled on/off checkbox styled as a retro button. */
+export function toggle(o: ToggleOptions): Control<boolean> {
+  const row = div('vp-row');
+  const label = div('vp-label');
+  label.textContent = o.label;
+  const btn = document.createElement('button');
+  btn.className = 'vp-btn vp-toggle';
+  btn.type = 'button';
+  let value = false;
+  const paint = (): void => {
+    btn.classList.toggle('vp-on', value);
+    btn.textContent = value ? 'On' : 'Off';
+    btn.setAttribute('aria-pressed', String(value));
+  };
+  btn.addEventListener('click', () => {
+    value = !value;
+    paint();
+    o.onInput(value);
+  });
+  paint();
+  row.append(label, btn);
+  return {
+    el: row,
+    set(v: boolean): void {
+      value = v;
+      paint();
+    },
+  };
+}
+
+/** A read-only labeled value (for computed readouts like camera deltas). */
+export function readoutField(label: string): Control<string> {
+  const row = div('vp-row');
+  const name = div('vp-label');
+  name.textContent = label;
+  const value = div('vp-readout vp-readout-wide');
+  value.textContent = '\u2013';
+  row.append(name, value);
+  return {
+    el: row,
+    set(v: string): void {
+      value.textContent = v;
+    },
+  };
+}
+
+export interface ButtonGroupOptions {
+  label: string;
+  options: ReadonlyArray<{ value: string; label: string }>;
+  onInput: (v: string) => void;
+}
+
+/** A row of mutually-exclusive buttons (e.g. Poly 1·2·4·8, Texture O·L·M·H). */
+export function buttonGroup(o: ButtonGroupOptions): Control<string> {
+  const row = div('vp-row');
+  const label = div('vp-label');
+  label.textContent = o.label;
+  const bar = div('vp-btngroup');
+  const buttons = new Map<string, HTMLButtonElement>();
+  let current = '';
+  const paint = (): void => {
+    for (const [val, b] of buttons) b.classList.toggle('vp-on', val === current);
+  };
+  for (const opt of o.options) {
+    const b = document.createElement('button');
+    b.className = 'vp-btn vp-btn-mini';
+    b.type = 'button';
+    b.textContent = opt.label;
+    b.addEventListener('click', () => {
+      current = opt.value;
+      paint();
+      o.onInput(opt.value);
+    });
+    buttons.set(opt.value, b);
+    bar.append(b);
+  }
+  row.append(label, bar);
+  return {
+    el: row,
+    set(v: string): void {
+      current = v;
+      paint();
+    },
+  };
+}

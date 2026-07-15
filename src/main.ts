@@ -1,6 +1,7 @@
 import './styles/global.css';
 import { App } from './app';
 import { ControlPanel } from './ui/ControlPanel';
+import { MenuBar } from './ui/MenuBar';
 
 const canvas = document.getElementById('viewport');
 const uiRoot = document.getElementById('ui-root');
@@ -13,6 +14,8 @@ if (!uiRoot) {
 
 try {
   const app = new App(canvas);
+  const menuBar = new MenuBar(app);
+  uiRoot.append(menuBar.el);
   const panel = new ControlPanel(app);
   uiRoot.append(panel.el);
 

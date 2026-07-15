@@ -59,3 +59,25 @@ export function normalize01(hm: Heightmap): void {
 export function heightAt(hm: Heightmap, x: number, y: number): number {
   return hm.data[y * hm.size + x];
 }
+
+/**
+ * Decimate a heightmap by an integer stride (Poly LOD: 1 = full, 2/4/8 = coarser)
+ * by point-sampling every `stride`-th vertex. Returns the same heightmap when
+ * stride ≤ 1. The result keeps the terrain footprint but has fewer vertices, so
+ * geometry and per-vertex coloring stay in lock-step.
+ */
+export function decimateHeightmap(hm: Heightmap, stride: number): Heightmap {
+  if (stride <= 1) return hm;
+  const size = hm.size;
+  const newSize = Math.floor((size - 1) / stride) + 1;
+  const out = createHeightmap(newSize);
+  for (let y = 0; y < newSize; y++) {
+    const sy = Math.min(size - 1, y * stride);
+    for (let x = 0; x < newSize; x++) {
+      const sx = Math.min(size - 1, x * stride);
+      out.data[y * newSize + x] = hm.data[sy * size + sx];
+    }
+  }
+  recomputeRange(out);
+  return out;
+}
