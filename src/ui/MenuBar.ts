@@ -12,6 +12,9 @@ import { exportObj } from '../io/exportMesh';
 import { exportPng } from '../io/exportImage';
 import { Flythrough, type CameraKeyframe } from '../io/script';
 
+/** Public project repository, opened by the GitHub menu button. */
+const REPO_URL = 'https://github.com/toby/vista';
+
 const GR_MODES: GraphicsMode[] = [
   'fit',
   '320x240',
@@ -49,8 +52,14 @@ export class MenuBar {
       this.item('Script', () => this.toggleScript()),
       this.item('ImpExp', () => this.impExp()),
       this.item('IQ', () => this.cycleIq()),
+      this.item('GitHub', () => this.openRepo()),
     );
     return bar;
+  }
+
+  /** Open the project repository in a new tab. */
+  private openRepo(): void {
+    window.open(REPO_URL, '_blank', 'noopener,noreferrer');
   }
 
   private item(label: string, onClick: () => void): HTMLButtonElement {
