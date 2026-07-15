@@ -2,9 +2,12 @@
 
 A browser-based homage to **[VistaPro](https://en.wikipedia.org/wiki/VistaPro)**,
 the classic 1990s 3-D fractal scenery generator. Generate a landscape from a
-number, color it by elevation, add water, sky, clouds, haze and sun light, fly a
-camera around it, and export the result — **entirely client-side**. No servers,
-no backend, no data leaves the browser.
+number, shape it with rivers, lakes, valleys and cliffs, color it by elevation,
+scatter trees, add water, sky, clouds, haze and sun light, fly a camera around
+it, and export the result — **entirely client-side**. No servers, no backend, no
+data leaves the browser.
+
+**Try it: [https://toby.github.io/vista/](https://toby.github.io/vista/)**
 
 ## Features
 
@@ -46,7 +49,7 @@ no backend, no data leaves the browser.
 
 ## Getting started
 
-Requires Node.js 18+ and npm.
+Requires Node.js 20.19+ or 22.12+ (as required by Vite 8) and npm.
 
 ```bash
 npm install       # install dependencies
@@ -98,14 +101,24 @@ src/
               detail texture, and the retro shading material
   ui/         top menu bar + retro control panel + widgets
   io/         PNG/OBJ export, heightmap import, camera flythrough, JSON save/load
+  styles/     base global CSS (the retro panel's CSS lives in ui/)
+  main.ts     bootstraps the App and mounts the menu bar + control panel
   app.ts      wires state ↔ renderer ↔ UI and reconciles changes
 ```
 
 ## Deployment
 
-`npm run build` emits a fully static bundle in `dist/` with **relative** asset
-paths, so it runs from any static host (GitHub Pages, S3, Netlify, a plain file
-server, …). Just serve the `dist/` directory.
+The app is live on **GitHub Pages** at
+**[https://toby.github.io/vista/](https://toby.github.io/vista/)**.
+
+Every push to `main` is built and published automatically by the
+[Deploy to GitHub Pages](.github/workflows/deploy.yml) GitHub Actions workflow
+(it can also be run on demand from the repository's **Actions** tab).
+
+Because `npm run build` emits a fully static bundle in `dist/` with **relative**
+asset paths (`base: './'` in `vite.config.ts`), the same build also runs from any
+other static host (S3, Netlify, a plain file server, …) — just serve the `dist/`
+directory.
 
 ## Credits
 
